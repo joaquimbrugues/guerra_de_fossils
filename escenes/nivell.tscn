@@ -65,7 +65,11 @@ metadata/_edit_lock_ = true
 shape = SubResource("RectangleShape2D_r0mg4")
 metadata/_edit_lock_ = true
 
-[node name="Personatge" parent="." unique_id=879555523 instance=ExtResource("2_r0mg4")]
+[node name="Personatge1" parent="." unique_id=879555523 instance=ExtResource("2_r0mg4")]
 position = Vector2(554, 58)
 
-[node name="Camera2D" type="Camera2D" parent="Personatge" unique_id=667623381]
+[node name="Camera2D" type="Camera2D" parent="Personatge1" unique_id=667623381]
+
+[node name="Personatge2" parent="." unique_id=1358387580 instance=ExtResource("2_r0mg4")]
+position = Vector2(683, 45)
+id_personatge = 1

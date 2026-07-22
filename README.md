@@ -9,7 +9,7 @@ Aquest és el repositori compartit per crear un joc de cara a la [GMTK Jam 2026]
     - [X] Moviment normal
     - [X] Escalar parets
 - [ ] Duplicar personatges i càmeres
-    - [ ] Duplicar personatges i separar controls
+    - [X] Duplicar personatges i separar controls
     - [ ] Tenir dues càmeres i separar la pantalla en dues meitats
 - [ ] Afegir la dinàmica d'ítems
     - [ ] Agafar ítems i subjectar a les mans

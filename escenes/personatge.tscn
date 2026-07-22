@@ -7,7 +7,7 @@ radius = 12.0
 height = 36.0
 
 [node name="Personatge" type="CharacterBody2D" unique_id=879555523]
-collision_mask = 3
+collision_mask = 2
 script = ExtResource("1_ixefd")
 rapidesa_x = 340.0
 rapidesa_y = 150.0

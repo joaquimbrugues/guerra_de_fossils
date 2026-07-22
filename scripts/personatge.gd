@@ -6,13 +6,30 @@ extends CharacterBody2D
 @export var rapidesa_y: float
 ## Velocitat de salt
 @export var velocitat_salt: float
-## Identificador del personatge (pot ser només 0 o 1)
+## Identificador del personatge (pot ser només 0 - esquerra o 1 - dreta)
 @export_range(0,1) var id_personatge: int
 
-func _physics_process(delta: float) -> void:
+# Identifica moviment horitzontal amb la ID del personatge corresponent
+func input_horitzontal() -> float:
+	if id_personatge == 0:
+		return Input.get_axis("p1_esquerra", "p1_dreta")
+	else:
+		return Input.get_axis("p2_esquerra", "p2_dreta")
 
+# Identifica moviment vertical amb la ID del personatge corresponent
+func input_vertical() -> float:
+	if id_personatge == 0:
+		return Input.get_axis("p1_amunt", "p1_avall")
+	else:
+		return Input.get_axis("p2_amunt", "p2_avall")
+
+# Identifica si estem prement amunt amb la ID de personatge corresponent
+func amunt_premut() -> bool:
+	return (id_personatge == 0 and Input.is_action_just_pressed("p1_amunt")) or (id_personatge == 1 and Input.is_action_just_pressed("p2_amunt"))
+
+func _physics_process(delta: float) -> void:
 	# Input horitzontal, o frena
-	var direccio_x := Input.get_axis("p1_esquerra", "p1_dreta")
+	var direccio_x: float = input_horitzontal()
 	if direccio_x:
 		velocity.x = direccio_x * rapidesa_x
 	else:
@@ -21,18 +38,18 @@ func _physics_process(delta: float) -> void:
 	var escalant: bool = false
 
 	if is_on_wall():
-		var normal = get_wall_normal()
+		var normal: Vector2 = get_wall_normal()
 		if direccio_x == - normal.x:
-			escalant = true
 			# Estem "prement contra la paret". Escalem
-			var direccio_y: float = Input.get_axis("p1_amunt", "p1_avall")
+			escalant = true
+			var direccio_y: float = input_vertical()
 			if direccio_y:
 				velocity.y = direccio_y * rapidesa_y
 			else:
 				velocity.y = move_toward(velocity.y, 0, rapidesa_y)
 		if direccio_x == normal.x:
-			escalant = true
 			# Estem empenyent contra la paret: saltem!
+			escalant = true
 			velocity.y = velocitat_salt
 
 	if not escalant:
@@ -40,7 +57,7 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 		# Salt
-		if Input.is_action_just_pressed("p1_amunt") and is_on_floor():
+		if amunt_premut() and is_on_floor():
 			velocity.y = velocitat_salt
 
 	move_and_slide()

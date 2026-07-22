@@ -7,7 +7,7 @@ extends CharacterBody2D
 ## Velocitat de salt
 @export var velocitat_salt: float
 ## Controls dels personatge
-@export var controls: ControlsJugador
+@export var controls: ControlsJugador = null
 
 func _physics_process(delta: float) -> void:
 	# Input horitzontal, o frena

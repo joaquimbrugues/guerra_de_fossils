@@ -1,9 +1,13 @@
 extends CharacterBody2D
 
-
+## Velocitat de moviment horitzontal
 @export var rapidesa_x: float
+## Velocitat de moviment d'escalada vertical
 @export var rapidesa_y: float
+## Velocitat de salt
 @export var velocitat_salt: float
+## Identificador del personatge (pot ser només 0 o 1)
+@export_range(0,1) var id_personatge: int
 
 func _physics_process(delta: float) -> void:
 

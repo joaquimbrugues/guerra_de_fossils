@@ -4,12 +4,24 @@
 [ext_resource type="PackedScene" uid="uid://7wq1vsbs5mvw" path="res://escenes/personatge.tscn" id="2_r0mg4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
-size = Vector2(122, 123)
+size = Vector2(122.625, 122.75)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_r0mg4"]
+load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_34qa0"]
+size = Vector2(122.625, 122.75)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_lkhql"]
+load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r0mg4"]
+size = Vector2(476.75, 73.75)
 
 [node name="Nivell" type="Node2D" unique_id=347637331]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=688023076]
-position = Vector2(894, 625)
+position = Vector2(541, 388)
 scale = Vector2(4, 4)
 collision_layer = 2
 collision_mask = 0
@@ -23,7 +35,37 @@ position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_1pj1a")
 metadata/_edit_lock_ = true
 
+[node name="StaticBody2D3" type="StaticBody2D" parent="." unique_id=927645944]
+position = Vector2(1066, 559)
+scale = Vector2(2.5, 2.5)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D3" unique_id=2070418253]
+texture = SubResource("CompressedTexture2D_r0mg4")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3" unique_id=1109516928]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_34qa0")
+metadata/_edit_lock_ = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="." unique_id=323287193]
+position = Vector2(918, 941)
+scale = Vector2(4, 4)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2" unique_id=2061801306]
+scale = Vector2(3.7539063, 0.5859375)
+texture = SubResource("CompressedTexture2D_lkhql")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2" unique_id=311384936]
+shape = SubResource("RectangleShape2D_r0mg4")
+metadata/_edit_lock_ = true
+
 [node name="Personatge" parent="." unique_id=879555523 instance=ExtResource("2_r0mg4")]
-position = Vector2(918, 314)
+position = Vector2(554, 58)
 
 [node name="Camera2D" type="Camera2D" parent="Personatge" unique_id=667623381]

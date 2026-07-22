@@ -10,7 +10,7 @@ height = 36.0
 collision_mask = 3
 script = ExtResource("1_ixefd")
 rapidesa_x = 340.0
-rapidesa_y = 100.0
+rapidesa_y = 150.0
 velocitat_salt = -450.0
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]

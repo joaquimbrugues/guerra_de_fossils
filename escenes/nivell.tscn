@@ -71,8 +71,6 @@ metadata/_edit_lock_ = true
 position = Vector2(554, 58)
 controls = ExtResource("3_lkhql")
 
-[node name="Camera2D" type="Camera2D" parent="Personatge1" unique_id=667623381]
-
 [node name="Personatge2" parent="." unique_id=1358387580 instance=ExtResource("2_r0mg4")]
 position = Vector2(683, 45)
 controls = ExtResource("4_l2idp")

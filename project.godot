@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Guerra de fossils"
-run/main_scene="uid://bbv3rut66uef6"
+run/main_scene="uid://binohicl0bjiv"
 config/features=PackedStringArray("4.7", "Double Precision", "GL Compatibility")
 config/icon="res://icon.svg"
 

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ControlsJugador" format=3 uid="uid://ci1x86qaomued"]
+
+[ext_resource type="Script" uid="uid://dwkh4vii6nkmb" path="res://scripts/controls_jugador.gd" id="1_ak4su"]
+
+[resource]
+script = ExtResource("1_ak4su")
+index_jugador = 1
+mou_esquerra = &"p2_esquerra"
+mou_dreta = &"p2_dreta"
+mou_amunt = &"p2_amunt"
+mou_avall = &"p2_avall"
+metadata/_custom_type_script = "uid://dwkh4vii6nkmb"

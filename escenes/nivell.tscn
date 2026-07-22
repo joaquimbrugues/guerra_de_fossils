@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://dhrui3tcv86ha" path="res://icon.svg" id="1_opjtr"]
 [ext_resource type="PackedScene" uid="uid://7wq1vsbs5mvw" path="res://escenes/personatge.tscn" id="2_r0mg4"]
+[ext_resource type="Resource" uid="uid://bnif7iq8e25kw" path="res://recursos/controls_jugador1.tres" id="3_lkhql"]
+[ext_resource type="Resource" uid="uid://ci1x86qaomued" path="res://recursos/controls_jugador2.tres" id="4_l2idp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
 size = Vector2(122.625, 122.75)
@@ -67,9 +69,10 @@ metadata/_edit_lock_ = true
 
 [node name="Personatge1" parent="." unique_id=879555523 instance=ExtResource("2_r0mg4")]
 position = Vector2(554, 58)
+controls = ExtResource("3_lkhql")
 
 [node name="Camera2D" type="Camera2D" parent="Personatge1" unique_id=667623381]
 
 [node name="Personatge2" parent="." unique_id=1358387580 instance=ExtResource("2_r0mg4")]
 position = Vector2(683, 45)
-id_personatge = 1
+controls = ExtResource("4_l2idp")

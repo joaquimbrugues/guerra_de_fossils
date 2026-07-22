@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://bbv3rut66uef6"]
+
+[ext_resource type="Texture2D" uid="uid://dhrui3tcv86ha" path="res://icon.svg" id="1_opjtr"]
+[ext_resource type="PackedScene" uid="uid://7wq1vsbs5mvw" path="res://escenes/personatge.tscn" id="2_r0mg4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
+size = Vector2(122, 123)
+
+[node name="Nivell" type="Node2D" unique_id=347637331]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=688023076]
+position = Vector2(894, 625)
+scale = Vector2(4, 4)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D" unique_id=1703519508]
+texture = ExtResource("1_opjtr")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=942432766]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_1pj1a")
+metadata/_edit_lock_ = true
+
+[node name="Personatge" parent="." unique_id=879555523 instance=ExtResource("2_r0mg4")]
+position = Vector2(918, 314)
+
+[node name="Camera2D" type="Camera2D" parent="Personatge" unique_id=667623381]

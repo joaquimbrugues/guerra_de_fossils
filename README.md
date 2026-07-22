@@ -5,9 +5,9 @@ Aquest és el repositori compartit per crear un joc de cara a la [GMTK Jam 2026]
 ## Full de ruta per a la versió 0.1
 
 - [ ] Crear terreny de prova per a les plataformes
-- [ ] Personatge que es pugui moure amb les plataformes
-    - [ ] Moviment normal
-    - [ ] Escalar parets
+- [X] Personatge que es pugui moure amb les plataformes
+    - [X] Moviment normal
+    - [X] Escalar parets
 - [ ] Duplicar personatges i càmeres
     - [ ] Duplicar personatges i separar controls
     - [ ] Tenir dues càmeres i separar la pantalla en dues meitats

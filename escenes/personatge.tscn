@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://7wq1vsbs5mvw"]
+
+[ext_resource type="Script" uid="uid://d3r8y7evhk0ka" path="res://scripts/personatge.gd" id="1_ixefd"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1pj1a"]
+radius = 12.0
+height = 36.0
+
+[node name="Personatge" type="CharacterBody2D" unique_id=879555523]
+collision_mask = 3
+script = ExtResource("1_ixefd")
+rapidesa_x = 340.0
+rapidesa_y = 100.0
+velocitat_salt = -450.0
+
+[node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
+shape = SubResource("CapsuleShape2D_1pj1a")

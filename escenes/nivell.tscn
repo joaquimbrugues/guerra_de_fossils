@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://7wq1vsbs5mvw" path="res://escenes/personatge.tscn" id="2_r0mg4"]
 [ext_resource type="Resource" uid="uid://bnif7iq8e25kw" path="res://recursos/controls_jugador1.tres" id="3_lkhql"]
 [ext_resource type="Resource" uid="uid://ci1x86qaomued" path="res://recursos/controls_jugador2.tres" id="4_l2idp"]
+[ext_resource type="PackedScene" uid="uid://b3e7qqtkvi5ms" path="res://escenes/item_exemple.tscn" id="5_l2idp"]
 
 [node name="Nivell" type="Node2D" unique_id=347637331]
 
@@ -20,3 +21,6 @@ controls = ExtResource("3_lkhql")
 [node name="Personatge2" parent="." unique_id=1358387580 instance=ExtResource("2_r0mg4")]
 position = Vector2(6272, -3498)
 controls = ExtResource("4_l2idp")
+
+[node name="ItemExemple" parent="." unique_id=1276965190 instance=ExtResource("5_l2idp")]
+position = Vector2(1341, -1104)

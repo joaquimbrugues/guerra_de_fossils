@@ -65,6 +65,11 @@ p2_avall={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://assets/traduccions.cat.translation", "res://assets/traduccions.en.translation")
+locale/test="cat"
+
 [layer_names]
 
 2d_physics/layer_1="Personatges"
@@ -74,6 +79,7 @@ p2_avall={
 [physics]
 
 3d/physics_engine="Jolt Physics"
+2d/default_gravity=9800.0
 
 [rendering]
 

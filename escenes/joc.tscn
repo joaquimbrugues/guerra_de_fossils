@@ -28,6 +28,7 @@ unique_name_in_owner = true
 
 [node name="CameraEsquerra" type="Camera2D" parent="HBoxContainer/ContenidorEsquerra/SubViewportEsquerra" unique_id=865913135]
 unique_name_in_owner = true
+zoom = Vector2(0.1, 0.1)
 
 [node name="Separador" type="ColorRect" parent="HBoxContainer" unique_id=649935806]
 custom_minimum_size = Vector2(5, 0)
@@ -46,3 +47,4 @@ render_target_update_mode = 4
 
 [node name="CameraDreta" type="Camera2D" parent="HBoxContainer/ContenidorDreta/SubViewportDreta" unique_id=1563790388]
 unique_name_in_owner = true
+zoom = Vector2(0.1, 0.1)

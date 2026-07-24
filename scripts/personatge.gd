@@ -38,6 +38,9 @@ var objecte_en_ma: Item = null:
 			call_deferred("add_child", objecte_en_ma)
 			objecte_en_ma.position = posicio_objecte.position
 			objecte_en_ma.agafat = true	# Això inclou una crida a Item.set_agafat(), que congela la física i col·lisions de l'objecte
+			if objecte_en_ma is Explosiu:
+				# Donem propietari a l'explosiu
+				objecte_en_ma.darrer_propietari = controls.index_jugador
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA
 # Força acumulada pel personatge
@@ -88,8 +91,8 @@ func llençar_objecte() -> void:
 		else:
 			direccio = direccio.rotated(deg_to_rad(-60))
 		var força_llançament: Vector2 = direccio * força / objecte_en_ma.mass
-		objecte_en_ma.apply_central_impulse(força_llançament)
 		objecte_alliberat.emit(objecte_en_ma)	# Enviem la senyal perquè el pare del node Personatge trobi un nou pare per a l'objecte
+		objecte_en_ma.call_deferred("apply_central_impulse", força_llançament)
 		objecte_en_ma = null	# Alliberem l'objecte de la mà
 
 func _process(delta: float) -> void:
@@ -140,7 +143,9 @@ func _physics_process(delta: float) -> void:
 
 # Si un ítem entra a l'àrea on podem agafar objectes, introduïm-lo a la col·lecció d'objectes agafables
 func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
-	if body is Item and not body.agafat:
+	if body is Explosiu and not body.agafat and body.darrer_propietari != controls.index_jugador:
+		agafar_explosiu(body as Explosiu)
+	elif body is Item and not body.agafat:
 		# Inserta body al diccionari
 		objectes_agafables[body as Item] = null
 

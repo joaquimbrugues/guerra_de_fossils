@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://brbsl25c07q5f"]
+
+[node name="Label" type="Label" unique_id=1042653500]
+offset_right = 110.0
+offset_bottom = 110.0
+theme_override_colors/font_color = Color(0.8627451, 0.039215688, 0.15294118, 1)
+theme_override_font_sizes/font_size = 254
+text = "3!"
+horizontal_alignment = 1
+vertical_alignment = 1

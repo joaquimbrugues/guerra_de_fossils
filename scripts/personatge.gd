@@ -41,6 +41,8 @@ var objecte_en_ma: Item = null:
 			if objecte_en_ma is Explosiu:
 				# Donem propietari a l'explosiu
 				objecte_en_ma.darrer_propietari = controls.index_jugador
+				# Resetegem el comptador sense explosiu en mà
+				temps_sense_explosius = 0.0
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA
 # Força acumulada pel personatge
@@ -97,13 +99,23 @@ func llençar_objecte() -> void:
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
+		# Agafem l'ítem més proper, si existeix, només si estem al terra
 		agafar_objecte()
 	elif Input.is_action_just_released(controls.llença):
+		# Si deixem de prémer el botó d'acumular força, llencem l'objecte a la mà i perdem tota la força
 		llençar_objecte()
 		força = força_minima
 	elif Input.is_action_pressed(controls.llença) and objecte_en_ma != null:
+		# Si tenim un objecte a la mà podem acumular força per llençar-lo
 		var inc_força = força_maxima * delta / temps_força_maxima
 		força = min(força_maxima, força + inc_força)
+	if temps_sense_explosius >= temps_maxim_sense_explosiu:
+		#Instancia un explosiu i agafa'l
+		var nou_explosiu: Explosiu = instanciar_explosiu()
+		agafar_explosiu(nou_explosiu)	# El `temps_sense_explosius` es reseteja quan et cau un explosiu a les mans
+	elif objecte_en_ma == null or objecte_en_ma is not Explosiu:
+		# Si no tenim un explosiu a la mà, augmenta el comptador
+		temps_sense_explosius += delta
 
 func _physics_process(delta: float) -> void:
 	# Input horitzontal, o frena

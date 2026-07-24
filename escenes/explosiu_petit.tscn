@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://btvstk0pkiw34"]
+
+[ext_resource type="Script" uid="uid://cno1ijy0q8qv" path="res://scripts/explosiu.gd" id="1_k7uqa"]
+[ext_resource type="Resource" uid="uid://c04a8au1qied6" path="res://recursos/propietats_explosiu_petit.tres" id="2_b6g4q"]
+[ext_resource type="Texture2D" uid="uid://p6ohb5i0on04" path="res://assets/sprites/exp_petit.png" id="3_d1hx7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwcrp"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(942, 0, 471, 1062)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rwoxd"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(1413, 0, 471, 1062)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5ie2b"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(0, 0, 471, 1062)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_epvpf"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(471, 0, 471, 1062)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u06l7"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(942, 0, 471, 1062)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y2yo2"]
+atlas = ExtResource("3_d1hx7")
+region = Rect2(1413, 0, 471, 1062)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1pj1a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bwcrp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rwoxd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5ie2b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_epvpf")
+}],
+"loop": 0,
+"name": &"explotant",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u06l7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y2yo2")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1pj1a"]
+radius = 49.0
+height = 282.0
+
+[node name="ExplosiuPetit" type="RigidBody2D" unique_id=1735068751]
+collision_layer = 4
+collision_mask = 7
+mass = 0.5
+script = ExtResource("1_k7uqa")
+propietats = ExtResource("2_b6g4q")
+metadata/_custom_type_script = "uid://cno1ijy0q8qv"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1910970993]
+scale = Vector2(0.4, 0.4)
+sprite_frames = SubResource("SpriteFrames_1pj1a")
+animation = &"explotant"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1441784655]
+position = Vector2(-11, 59)
+shape = SubResource("CapsuleShape2D_1pj1a")

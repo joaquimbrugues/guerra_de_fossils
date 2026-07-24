@@ -116,4 +116,3 @@ func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
 func _on_area_afagar_objectes_body_exited(body: Node2D) -> void:
 	if body is Item and body in objectes_agafables:
 		objectes_agafables.erase(body)
-		print(objectes_agafables)

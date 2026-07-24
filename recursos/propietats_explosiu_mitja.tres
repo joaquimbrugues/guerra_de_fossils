@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PropietatsExplosiu" format=3 uid="uid://bm8lm0id0lqcw"]
+
+[ext_resource type="Script" uid="uid://uj07vg5xedqk" path="res://scripts/propietats_explosiu.gd" id="1_5slxh"]
+
+[resource]
+script = ExtResource("1_5slxh")
+tipus_explosiu = 1
+radi_explosio = 2
+rang_durades = Vector2i(4, 7)
+metadata/_custom_type_script = "uid://uj07vg5xedqk"

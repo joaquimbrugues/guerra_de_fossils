@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://d3405s7yxiabh"]
+
+[ext_resource type="Script" uid="uid://cno1ijy0q8qv" path="res://scripts/explosiu.gd" id="1_li3ym"]
+[ext_resource type="Resource" uid="uid://bm8lm0id0lqcw" path="res://recursos/propietats_explosiu_mitja.tres" id="2_w3rbt"]
+[ext_resource type="Texture2D" uid="uid://b2l237nn57nou" path="res://assets/sprites/exp_mitjà.png" id="3_w3rbt"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3myb4"]
+atlas = ExtResource("3_w3rbt")
+region = Rect2(1760, 0, 880, 1050)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6j4e7"]
+atlas = ExtResource("3_w3rbt")
+region = Rect2(0, 1050, 880, 1050)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1pj1a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3myb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6j4e7")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1pj1a"]
+radius = 138.0
+height = 302.0
+
+[node name="ExplosiuMitja" type="RigidBody2D" unique_id=1231858949]
+collision_layer = 4
+collision_mask = 7
+mass = 0.75
+script = ExtResource("1_li3ym")
+propietats = ExtResource("2_w3rbt")
+metadata/_custom_type_script = "uid://cno1ijy0q8qv"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=486174886]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_1pj1a")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=27805490]
+position = Vector2(-3, 94)
+shape = SubResource("CapsuleShape2D_1pj1a")

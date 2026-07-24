@@ -5,6 +5,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
 size = Vector2(400, 400)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_1pj1a"]
+radius = 13.91662315362459
+
 [node name="Personatge" type="CharacterBody2D" unique_id=879555523]
 collision_mask = 2
 script = ExtResource("1_ixefd")
@@ -13,11 +16,25 @@ rapidesa_y = 1500.0
 velocitat_salt = -4500.0
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
-position = Vector2(200, 200)
 shape = SubResource("RectangleShape2D_1pj1a")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1655365102]
-offset_left = 1.0
-offset_right = 401.0
-offset_bottom = 400.0
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
 color = Color(1, 0, 0.12156863, 1)
+
+[node name="AreaAfagarObjectes" type="Area2D" parent="." unique_id=477650493]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaAfagarObjectes" unique_id=385445855]
+scale = Vector2(50, 50)
+shape = SubResource("CircleShape2D_1pj1a")
+
+[node name="PosicioObjecte" type="Marker2D" parent="." unique_id=83870367]
+position = Vector2(5, -359)
+
+[connection signal="body_entered" from="AreaAfagarObjectes" to="." method="_on_area_afagar_objectes_body_entered"]
+[connection signal="body_exited" from="AreaAfagarObjectes" to="." method="_on_area_afagar_objectes_body_exited"]

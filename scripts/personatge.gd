@@ -12,23 +12,62 @@ enum ORIENTACIO { ESQUERRA, DRETA, }
 @export var velocitat_salt: float
 ## Controls dels personatge (s'assignen a l'escena on col·loquem els personatges)
 @export var controls: ControlsJugador = null
+## Força mínima de llançament d'objectes, sense mantenir premut el botó
+@export var força_minima: float
 ## Força màxima de llançament d'objectes per part del jugador
 @export var força_maxima: float
 ## Temps (en segons) fins que el personatge adquireix la força màxima
 @export var temps_força_maxima: float
+## Temps (en segons) màxim sense tenir un explosiu a les mans
+@export var temps_maxim_sense_explosiu: float
+
+## Aquesta senyal indica que el Personatge ha deixat anar un objecte.
+## És responsabilitat de qui inclogui aquest node donar un nou pare al node `objecte`
+signal objecte_alliberat(objecte: Item)
 
 # Conjunt d'objectes agafables (fem servir un Diccionari com a forma "bruta" de substituir un Set, per evitar repeticions accidentals)
 var objectes_agafables: Dictionary[Item, Variant] = {}
 # Objecte actualment a la mà
-var objecte_en_ma: Item = null
+var objecte_en_ma: Item = null:
+	set(nou_objecte):
+		objecte_en_ma = nou_objecte
+		if objecte_en_ma != null:
+			var pare = objecte_en_ma.get_parent()
+			if pare != null:
+				pare.call_deferred("remove_child", objecte_en_ma)
+			call_deferred("add_child", objecte_en_ma)
+			objecte_en_ma.position = posicio_objecte.position
+			objecte_en_ma.agafat = true	# Això inclou una crida a Item.set_agafat(), que congela la física i col·lisions de l'objecte
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA
 # Força acumulada pel personatge
-var força: float = 0.0
+var força: float = força_minima
+# Temps acumulat sense explosius pel personatge
+var temps_sense_explosius: float = 0.0
+
+# Plantilles de les escenes d'explosiu petit, mitjà i gran
+var explosiu_petit = preload("uid://btvstk0pkiw34")
+var explosiu_mitjà = preload("uid://d3405s7yxiabh")
+var explosiu_gran = preload("uid://b3x4ysaenup5i")
+var plantilles_explosius := [explosiu_petit, explosiu_mitjà, explosiu_gran]
+
+# Mètode per crear una instància d'un explosiu a l'atzar:
+func instanciar_explosiu() -> Explosiu:
+	var plantilla = plantilles_explosius.pick_random()
+	return plantilla.instantiate()
+
+# Agafa un explosiu, sigui acabat d'instanciar o llençat.
+# Si ja hi havia un objecte a la mà, el deixem caure
+func agafar_explosiu(explosiu: Explosiu) -> void:
+	if objecte_en_ma != null:
+		força = força_minima
+		objecte_en_ma.agafat = false	#Això inclou ina crida a Item.set_agafat(), que descongela la física i les col·lisions de l'objecte
+		objecte_alliberat.emit(objecte_en_ma)
+	objecte_en_ma = explosiu	# Inclou la crida a la funció set de més amunt
 
 # Si el personatge no té cap objecte a la mà i, a més, hi ha objectes al conjunt `objectes_agafables`, llavors tria el més proper, insereix-lo a `objecte_agafat` i mou-lo al marcador d'objectes en mà
 # Retorna `true` si hem pres un objecte a la mà, `false` altrament
-func agafar_objecte() -> bool:
+func agafar_objecte() -> void:
 	if objecte_en_ma == null and not objectes_agafables.is_empty():
 		var proper: Item = null
 		var min_dist: float = 10000000
@@ -37,16 +76,9 @@ func agafar_objecte() -> bool:
 			var dist = own_position.distance_squared_to(item.get_global_position())
 			if dist < min_dist:
 				proper = item
-		objecte_en_ma = proper as Item
-		objecte_en_ma.reparent(posicio_objecte)
-		objecte_en_ma.position = posicio_objecte.position
-		objecte_en_ma.agafat = true	# Això inclou una crida a Item.set_agafat(), que congela la física i col·lisions de l'objecte
-	return false
+		objecte_en_ma = proper as Item	# Això inclou la crida a la funció set de més amunt
 
-## Aquesta senyal indica que el Personatge ha deixat anar un objecte.
-## És responsabilitat de qui inclogui aquest node donar un nou pare al node `objecte`
-signal objecte_alliberat(objecte: Item)
-
+# Si tenim un objecte a la mà, llencem-lo amb l'impuls acumulat
 func llençar_objecte() -> void:
 	if objecte_en_ma != null:
 		objecte_en_ma.agafat = false	# Això inclou una crida a Item.set_agafat(), que descongela la física i les col·lisions de l'objecte
@@ -65,8 +97,8 @@ func _process(delta: float) -> void:
 		agafar_objecte()
 	elif Input.is_action_just_released(controls.llença):
 		llençar_objecte()
-		força = 0.0
-	elif Input.is_action_pressed(controls.llença):
+		força = força_minima
+	elif Input.is_action_pressed(controls.llença) and objecte_en_ma != null:
 		var inc_força = força_maxima * delta / temps_força_maxima
 		força = min(força_maxima, força + inc_força)
 

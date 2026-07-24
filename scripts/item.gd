@@ -4,4 +4,5 @@ extends RigidBody2D
 var agafat: bool = false:
 	set(nou_agafat):
 		agafat = nou_agafat
-		set_freeze_enabled(agafat)
+		set_deferred("freeze", agafat)
+		#set_freeze_enabled(agafat)

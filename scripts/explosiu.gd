@@ -20,13 +20,18 @@ func _ready() -> void:
 func temporitzador_acabat() -> void:
 	if compte_enrere == 0:
 		# EXPLOSIÓ!
-		#TODO
-		print("Explosió!")
+		var animated_sprite = get_child(0) as AnimatedSprite2D	# Poc robust, però suficient si som consistents
+		animated_sprite.play("explotant")
+		animated_sprite.animation_finished.connect(func ():
+			explosio_bomba.emit(self)
+			queue_free()
+		)
 	else:
 		# COMPTE ENRERE
 		afegeix_etiqueta_compte_enrere()
 		compte_enrere -= 1
-		get_tree().create_timer(1, false).timeout.connect(temporitzador_acabat)
+		var temps_restant = 1.0 if compte_enrere > 0 else 0.5
+		get_tree().create_timer(temps_restant, false).timeout.connect(temporitzador_acabat)
 
 func afegeix_etiqueta_compte_enrere() -> void:
 	var etiqueta_compte_enrere = plantilla_etiqueta_compte_enrere.instantiate()
@@ -34,7 +39,3 @@ func afegeix_etiqueta_compte_enrere() -> void:
 	add_child(etiqueta_compte_enrere)
 	etiqueta_compte_enrere.position = Vector2(-100, -550)
 	get_tree().create_timer(0.8, false).timeout.connect(func (): etiqueta_compte_enrere.queue_free())
-
-#TODO: Quan s'acabi el temporitzador, enviar una senyal d'explosio a l'escena responsable
-#TODO: Quan s'acabi el temporitzador, fer l'animació d'explosió
-#TODO: Enviar senyals a 3, 2 i 1 del temporitzador per fer efectes a l'escena corresponent

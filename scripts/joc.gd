@@ -14,7 +14,6 @@ extends Control
 	},
 ]
 func _ready() -> void:
-	
 	# Compartim el world2d del viewport esquerre (que ja el té pel fet d'incloure el Nivell com a fill) amb el viewport de la dreta
 	jugadors[1].sub_viewport.world_2d = jugadors[0].sub_viewport.world_2d
 	

@@ -11,3 +11,5 @@ extends Resource
 @export var mou_amunt: StringName = "p1_amunt"
 ## Nom (al mapa d'entrades) de la tecla per moure's avall
 @export var mou_avall: StringName = "p1_avall"
+## Nom (al mapa d'entrades) de la tecla per llençar objectes
+@export var llença: StringName = "p1_llançar"

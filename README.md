@@ -11,9 +11,9 @@ Aquest és el repositori compartit per crear un joc de cara a la [GMTK Jam 2026]
 - [X] Duplicar personatges i càmeres
     - [X] Duplicar personatges i separar controls
     - [X] Tenir dues càmeres i separar la pantalla en dues meitats
-- [ ] Afegir la dinàmica d'ítems
+- [X] Afegir la dinàmica d'ítems
     - [X] Agafar ítems i subjectar a les mans
-    - [ ] Llençar ítems (grau de força)
+    - [X] Llençar ítems (grau de força)
 - [ ] BOMBES
     - [ ] 3 tipus de bomba
     - [ ] Aparèixe's un tipus de bomba a l'atzar

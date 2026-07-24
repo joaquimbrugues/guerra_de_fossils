@@ -39,5 +39,7 @@ controls = ExtResource("3_lkhql")
 position = Vector2(6272, -3498)
 controls = ExtResource("4_l2idp")
 
+[connection signal="explosio_bomba" from="Personatge1" to="." method="_on_personatge_1_explosio_bomba"]
 [connection signal="objecte_alliberat" from="Personatge1" to="." method="_on_personatge_1_objecte_alliberat"]
+[connection signal="explosio_bomba" from="Personatge2" to="." method="_on_personatge_2_explosio_bomba"]
 [connection signal="objecte_alliberat" from="Personatge2" to="." method="_on_personatge_2_objecte_alliberat"]

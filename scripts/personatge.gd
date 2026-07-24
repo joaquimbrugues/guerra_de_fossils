@@ -25,6 +25,9 @@ enum ORIENTACIO { ESQUERRA, DRETA, }
 ## És responsabilitat de qui inclogui aquest node donar un nou pare al node `objecte`
 signal objecte_alliberat(objecte: Item)
 
+## Senyal d'explosió de la bomba
+signal explosio_bomba(bomba: Explosiu)
+
 # Conjunt d'objectes agafables (fem servir un Diccionari com a forma "bruta" de substituir un Set, per evitar repeticions accidentals)
 var objectes_agafables: Dictionary[Item, Variant] = {}
 # Objecte actualment a la mà
@@ -59,7 +62,9 @@ var plantilles_explosius := [explosiu_petit, explosiu_mitjà, explosiu_gran]
 # Mètode per crear una instància d'un explosiu a l'atzar:
 func instanciar_explosiu() -> Explosiu:
 	var plantilla = plantilles_explosius.pick_random()
-	return plantilla.instantiate()
+	var bomba: Explosiu = plantilla.instantiate()
+	bomba.explosio_bomba.connect(func(b): explosio_bomba.emit(b))
+	return bomba
 
 # Agafa un explosiu, sigui acabat d'instanciar o llençat.
 # Si ja hi havia un objecte a la mà, el deixem caure

@@ -12,8 +12,10 @@ enum ORIENTACIO { ESQUERRA, DRETA, }
 @export var velocitat_salt: float
 ## Controls dels personatge (s'assignen a l'escena on col·loquem els personatges)
 @export var controls: ControlsJugador = null
-## Força de llançament d'objectes per part del jugador
-@export var força: float
+## Força màxima de llançament d'objectes per part del jugador
+@export var força_maxima: float
+## Temps (en segons) fins que el personatge adquireix la força màxima
+@export var temps_força_maxima: float
 
 # Conjunt d'objectes agafables (fem servir un Diccionari com a forma "bruta" de substituir un Set, per evitar repeticions accidentals)
 var objectes_agafables: Dictionary[Item, Variant] = {}
@@ -21,6 +23,8 @@ var objectes_agafables: Dictionary[Item, Variant] = {}
 var objecte_en_ma: Item = null
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA
+# Força acumulada pel personatge
+var força: float = 0.0
 
 # Si el personatge no té cap objecte a la mà i, a més, hi ha objectes al conjunt `objectes_agafables`, llavors tria el més proper, insereix-lo a `objecte_agafat` i mou-lo al marcador d'objectes en mà
 # Retorna `true` si hem pres un objecte a la mà, `false` altrament
@@ -56,11 +60,15 @@ func llençar_objecte() -> void:
 		objecte_alliberat.emit(objecte_en_ma)	# Enviem la senyal perquè el pare del node Personatge trobi un nou pare per a l'objecte
 		objecte_en_ma = null	# Alliberem l'objecte de la mà
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
 		agafar_objecte()
-	elif Input.is_action_just_pressed(controls.llença):
+	elif Input.is_action_just_released(controls.llença):
 		llençar_objecte()
+		força = 0.0
+	elif Input.is_action_pressed(controls.llença):
+		var inc_força = força_maxima * delta / temps_força_maxima
+		força = min(força_maxima, força + inc_força)
 
 func _physics_process(delta: float) -> void:
 	# Input horitzontal, o frena

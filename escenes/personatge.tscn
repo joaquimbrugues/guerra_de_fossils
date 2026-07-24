@@ -14,7 +14,8 @@ script = ExtResource("1_ixefd")
 rapidesa_x = 3000.0
 rapidesa_y = 1500.0
 velocitat_salt = -4500.0
-"força" = 10000.0
+"força_maxima" = 6000.0
+"temps_força_maxima" = 3.0
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
 shape = SubResource("RectangleShape2D_1pj1a")

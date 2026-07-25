@@ -110,11 +110,17 @@ func instanciar_explosiu() -> Explosiu:
 
 # Agafa un explosiu, sigui acabat d'instanciar o llençat.
 # Si ja hi havia un objecte a la mà, el deixem caure
-func agafar_explosiu(explosiu: Explosiu) -> void:
+func agafar_explosiu(explosiu: Explosiu, treient: bool) -> void:
 	if objecte_en_ma != null:
 		força = força_minima
 		objecte_en_ma.agafat = false	#Això inclou ina crida a Item.set_agafat(), que descongela la física i les col·lisions de l'objecte
 		objecte_alliberat.emit(objecte_en_ma)
+	if treient and is_on_floor() and estat == ESTAT_ANIMACIO.QUIET:
+		animated_sprite_2d.play("treure_objecte")
+		animacio_bloquejada = true
+		treient_explosiu = true
+		await animated_sprite_2d.animation_changed
+	treient_explosiu = false
 	objecte_en_ma = explosiu	# Inclou la crida a la funció set de més amunt
 
 # Si el personatge no té cap objecte a la mà i, a més, hi ha objectes al conjunt `objectes_agafables`, llavors tria el més proper, insereix-lo a `objecte_agafat` i mou-lo al marcador d'objectes en mà
@@ -144,6 +150,9 @@ func llençar_objecte() -> void:
 		objecte_en_ma.call_deferred("apply_central_impulse", força_llançament)
 		objecte_en_ma = null	# Alliberem l'objecte de la mà
 
+# Aquesta flag controla si estem en el procés de treure un explosiu
+var treient_explosiu: bool = false
+
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
 		# Agafem l'ítem més proper, si existeix, només si estem al terra
@@ -158,10 +167,10 @@ func _process(delta: float) -> void:
 		# Si tenim un objecte a la mà podem acumular força per llençar-lo
 		var inc_força = força_maxima * delta / temps_força_maxima
 		força = min(força_maxima, força + inc_força)
-	if temps_sense_explosius >= temps_maxim_sense_explosiu:
+	if temps_sense_explosius >= temps_maxim_sense_explosiu and not treient_explosiu:
 		#Instancia un explosiu i agafa'l
 		var nou_explosiu: Explosiu = instanciar_explosiu()
-		agafar_explosiu(nou_explosiu)	# El `temps_sense_explosius` es reseteja quan et cau un explosiu a les mans
+		agafar_explosiu(nou_explosiu, true)	# El `temps_sense_explosius` es reseteja quan et cau un explosiu a les mans
 	elif objecte_en_ma == null or objecte_en_ma is not Explosiu:
 		# Si no tenim un explosiu a la mà, augmenta el comptador
 		temps_sense_explosius += delta
@@ -265,6 +274,7 @@ func _ready() -> void:
 # Ens ajuda a enllaçar algunes animacions
 func _on_animated_sprite_2d_animation_finished() -> void:
 	animacio_bloquejada = false
+	treient_explosiu = false
 	actualitza_animacio(estat)
 
 # Per arreglar algunes transicions estranyes entre animacions
@@ -284,7 +294,7 @@ func salta() -> void:
 # Si un ítem entra a l'àrea on podem agafar objectes, introduïm-lo a la col·lecció d'objectes agafables
 func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
 	if body is Explosiu and not body.agafat and body.darrer_propietari != controls.index_jugador:
-		agafar_explosiu(body as Explosiu)
+		agafar_explosiu(body as Explosiu, false)
 	elif body is Item and not body.agafat:
 		# Inserta body al diccionari
 		objectes_agafables[body as Item] = null

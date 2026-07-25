@@ -15,9 +15,9 @@ script = ExtResource("1_ixefd")
 rapidesa_x = 3000.0
 rapidesa_y = 1500.0
 velocitat_salt = -4500.0
-"força_minima" = 1000.0
-"força_maxima" = 6000.0
-"temps_força_maxima" = 3.0
+"força_minima" = 8000.0
+"força_maxima" = 15000.0
+"temps_força_maxima" = 2.5
 temps_maxim_sense_explosiu = 5.0
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
@@ -46,7 +46,7 @@ position = Vector2(0, -775)
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1807499749]
 scale = Vector2(0.75, 0.75)
 sprite_frames = ExtResource("2_skwxk")
-animation = &"treure_objecte"
+animation = &"quiet_llençar"
 metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="AreaAfagarObjectes" to="." method="_on_area_afagar_objectes_body_entered"]

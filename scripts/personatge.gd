@@ -34,18 +34,21 @@ signal explosio_bomba(bomba: Explosiu)
 
 # Conjunt d'objectes agafables (fem servir un Diccionari com a forma "bruta" de substituir un Set, per evitar repeticions accidentals)
 var objectes_agafables: Dictionary[Item, Variant] = {}
+
 # Posicio de l'objecte a la mà (o on apareixerà)
 var posicio_objecte_ma: Vector2:
 	set(nova_posicio):
 		if objecte_en_ma != null:
 			objecte_en_ma.position = nova_posicio
 		posicio_objecte_ma = nova_posicio
+
 # Objecte actualment a la mà
 var objecte_en_ma: Item = null:
 	set(nou_objecte):
 		objecte_en_ma = nou_objecte
 		# Adapta l'animació al nou objecte/falta d'objecte
-		actualitza_animacio()
+		if not llençant:
+			actualitza_animacio()
 		if objecte_en_ma != null:
 			var pare = objecte_en_ma.get_parent()
 			if pare != null:
@@ -62,16 +65,17 @@ var objecte_en_ma: Item = null:
 # Indica si el personatge es troba escalant o no ara mateix
 var escalant: bool = false:
 	set(nou_escalant):
+		if nou_escalant != escalant:
+			if nou_escalant:
+				posicio_objecte_ma = posicio_objecte_dalt.position
+				força = força_minima
+			else:
+				match orientacio:
+					ORIENTACIO.DRETA:
+						posicio_objecte_ma = posicio_objecte_dreta.position
+					ORIENTACIO.ESQUERRA:
+						posicio_objecte_ma = posicio_objecte_esquerra.position
 		escalant = nou_escalant
-		if escalant:
-			posicio_objecte_ma = posicio_objecte_dalt.position
-			força = 0.0
-		else:
-			match orientacio:
-				ORIENTACIO.DRETA:
-					posicio_objecte_ma = posicio_objecte_dreta.position
-				ORIENTACIO.ESQUERRA:
-					posicio_objecte_ma = posicio_objecte_esquerra.position
 
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
@@ -89,12 +93,15 @@ var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
 				if estat != ESTAT_ANIMACIO.ESCALANT:
 					posicio_objecte_ma = posicio_objecte_esquerra.position
 # Força acumulada pel personatge
-var força: float = força_minima:
+var força: float:
 	set(nova_força):
+		if nova_força < força_minima:
+			print("Ep!")
 		força = nova_força
-		if força > força_minima and (estat == ESTAT_ANIMACIO.QUIET or estat == ESTAT_ANIMACIO.CORRENTS):
+		if not llençant and força > força_minima and (estat == ESTAT_ANIMACIO.QUIET or estat == ESTAT_ANIMACIO.CORRENTS):
 			posicio_objecte_ma = posicio_objecte_dalt.position
 			actualitza_animacio()
+
 # Temps acumulat sense explosius pel personatge
 var temps_sense_explosius: float = 0.0
 
@@ -142,19 +149,25 @@ func agafar_objecte() -> void:
 				proper = item
 		objecte_en_ma = proper as Item	# Això inclou la crida a la funció set de més amunt
 
+# Indica que ens trobem durant l'animació de llençar
+var llençant: bool = false
 # Si tenim un objecte a la mà, llencem-lo amb l'impuls acumulat
 func llençar_objecte() -> void:
 	if objecte_en_ma != null:
-		objecte_en_ma.agafat = false	# Això inclou una crida a Item.set_agafat(), que descongela la física i les col·lisions de l'objecte
-		var direccio := Vector2.UP
-		if orientacio == ORIENTACIO.DRETA:
-			direccio = direccio.rotated(deg_to_rad(60))
-		else:
-			direccio = direccio.rotated(deg_to_rad(-60))
-		var força_llançament: Vector2 = direccio * força / objecte_en_ma.mass
-		objecte_alliberat.emit(objecte_en_ma)	# Enviem la senyal perquè el pare del node Personatge trobi un nou pare per a l'objecte
-		objecte_en_ma.call_deferred("apply_central_impulse", força_llançament)
-		objecte_en_ma = null	# Alliberem l'objecte de la mà
+		animacio_llença()
+		await get_tree().create_timer(0.2, false).timeout
+		if objecte_en_ma != null:
+			# Protegim-nos del cas excepcional on haguem perdut l'objecte a la mà durant l'espera
+			objecte_en_ma.agafat = false	# Això inclou una crida a Item.set_agafat(), que descongela la física i les col·lisions de l'objecte
+			var direccio := Vector2.UP
+			if orientacio == ORIENTACIO.DRETA:
+				direccio = direccio.rotated(deg_to_rad(60))
+			else:
+				direccio = direccio.rotated(deg_to_rad(-60))
+			var força_llançament: Vector2 = direccio * força / objecte_en_ma.mass
+			objecte_alliberat.emit(objecte_en_ma)	# Enviem la senyal perquè el pare del node Personatge trobi un nou pare per a l'objecte
+			objecte_en_ma.call_deferred("apply_central_impulse", força_llançament)
+			objecte_en_ma = null	# Alliberem l'objecte de la mà
 
 # Aquesta flag controla si estem en el procés de treure un explosiu
 var treient_explosiu: bool = false
@@ -231,7 +244,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-
 ### COSES RELACIONADES AMB LES ANIMACIONS
 var animacio_bloquejada: bool = false
 enum ESTAT_ANIMACIO { QUIET, CORRENTS, ESCALANT, CAIENT, }
@@ -281,12 +293,15 @@ func _ready() -> void:
 			animated_sprite_2d.sprite_frames = cope
 		1:	#Wope
 			animated_sprite_2d.sprite_frames = wope
-	pass
+	# Inicialització de variables importants
+	posicio_objecte_ma = posicio_objecte_dreta.position
+	força = força_minima
 
 # Ens ajuda a enllaçar algunes animacions
 func _on_animated_sprite_2d_animation_finished() -> void:
 	animacio_bloquejada = false
 	treient_explosiu = false
+	llençant = false
 	actualitza_animacio()
 
 # Per arreglar algunes transicions estranyes entre animacions
@@ -301,6 +316,22 @@ func salta() -> void:
 	animacio_bloquejada = true
 	# Hem de crear un retard artifical per encaixar el salt amb l'animació
 	get_tree().create_timer(0.15, false, true).timeout.connect(func(): salt = true)
+
+# Activa l'animació de saltar, assumeix que no està escalant
+func animacio_llença() -> void:
+	match estat:
+		ESTAT_ANIMACIO.QUIET:
+			animated_sprite_2d.play("quiet_llençar")
+			animacio_bloquejada = true
+			llençant = true
+		ESTAT_ANIMACIO.CORRENTS:
+			animated_sprite_2d.play("corrents_llençar")
+			animacio_bloquejada = true
+			llençant = true
+		ESTAT_ANIMACIO.CAIENT:
+			animated_sprite_2d.play("caient_llençar")
+			animacio_bloquejada = true
+			llençant = true
 
 ### SENYALS
 # Si un ítem entra a l'àrea on podem agafar objectes, introduïm-lo a la col·lecció d'objectes agafables

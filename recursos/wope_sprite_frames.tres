@@ -557,7 +557,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_04jmv")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"saltar",
 "speed": 8.0
 }, {

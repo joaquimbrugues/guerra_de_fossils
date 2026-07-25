@@ -2,8 +2,10 @@ extends CharacterBody2D
 
 enum ORIENTACIO { ESQUERRA, DRETA, }
 
-@onready var posicio_objecte: Marker2D = $PosicioObjecte
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
+@onready var posicio_objecte_esquerra: Marker2D = $PosicioObjecteEsquerra
+@onready var posicio_objecte_dreta: Marker2D = $PosicioObjecteDreta
+@onready var posicio_objecte_escalant: Marker2D = $PosicioObjecteEscalant
 
 
 ## Velocitat de moviment horitzontal
@@ -32,32 +34,59 @@ signal explosio_bomba(bomba: Explosiu)
 
 # Conjunt d'objectes agafables (fem servir un Diccionari com a forma "bruta" de substituir un Set, per evitar repeticions accidentals)
 var objectes_agafables: Dictionary[Item, Variant] = {}
+# Posicio de l'objecte a la mà (o on apareixerà)
+var posicio_objecte_ma: Vector2:
+	set(nova_posicio):
+		if objecte_en_ma != null:
+			objecte_en_ma.position = nova_posicio
+		posicio_objecte_ma = nova_posicio
 # Objecte actualment a la mà
 var objecte_en_ma: Item = null:
 	set(nou_objecte):
 		objecte_en_ma = nou_objecte
+		# Adapta l'animació al nou objecte/falta d'objecte
+		actualitza_animacio(estat)
 		if objecte_en_ma != null:
 			var pare = objecte_en_ma.get_parent()
 			if pare != null:
 				pare.call_deferred("remove_child", objecte_en_ma)
 			call_deferred("add_child", objecte_en_ma)
-			objecte_en_ma.position = posicio_objecte.position
+			objecte_en_ma.position = posicio_objecte_ma
 			objecte_en_ma.agafat = true	# Això inclou una crida a Item.set_agafat(), que congela la física i col·lisions de l'objecte
 			if objecte_en_ma is Explosiu:
 				# Donem propietari a l'explosiu
 				objecte_en_ma.darrer_propietari = controls.index_jugador
 				# Resetegem el comptador sense explosiu en mà
 				temps_sense_explosius = 0.0
+
+# Indica si el personatge es troba escalant o no ara mateix
+var escalant: bool = false:
+	set(nou_escalant):
+		escalant = nou_escalant
+		if escalant:
+			posicio_objecte_ma = posicio_objecte_escalant.position
+		else:
+			match orientacio:
+				ORIENTACIO.DRETA:
+					posicio_objecte_ma = posicio_objecte_dreta.position
+				ORIENTACIO.ESQUERRA:
+					posicio_objecte_ma = posicio_objecte_esquerra.position
+
 # Orientació actual del personatge
 var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
 	set(nova_orientacio):
 		orientacio = nova_orientacio
 		# Canviar l'orientació de l'animatedsprite sempre que canviï l'orientació del personatge
+		# A més, si hi ha un objecte, moure'l a la nova posició
 		match orientacio:
 			ORIENTACIO.DRETA:
 				animated_sprite_2d.flip_h = false
+				if estat != ESTAT_ANIMACIO.ESCALANT:
+					posicio_objecte_ma = posicio_objecte_dreta.position
 			ORIENTACIO.ESQUERRA:
 				animated_sprite_2d.flip_h = true
+				if estat != ESTAT_ANIMACIO.ESCALANT:
+					posicio_objecte_ma = posicio_objecte_esquerra.position
 # Força acumulada pel personatge
 var força: float = força_minima
 # Temps acumulat sense explosius pel personatge
@@ -147,8 +176,6 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, rapidesa_x)
 
-	var escalant: bool = false
-
 	if is_on_wall():
 		var normal: Vector2 = get_wall_normal()
 		if direccio_x == - normal.x:
@@ -159,10 +186,14 @@ func _physics_process(delta: float) -> void:
 				velocity.y = direccio_y * rapidesa_y
 			else:
 				velocity.y = move_toward(velocity.y, 0, rapidesa_y)
-		if direccio_x == normal.x:
+		elif direccio_x == normal.x:
 			# Estem empenyent contra la paret: saltem!
 			escalant = true
 			velocity.y = velocitat_salt
+		else:
+			escalant = false
+	else:
+		escalant = false
 
 	if escalant:
 		# Adaptem l'animació
@@ -194,15 +225,28 @@ var estat: ESTAT_ANIMACIO:
 		estat = nou_estat
 
 func actualitza_animacio(e: ESTAT_ANIMACIO) -> void:
+	var te_objecte = objecte_en_ma != null
 	match e:
 		ESTAT_ANIMACIO.QUIET:
-			animated_sprite_2d.play("quiet")
+			if te_objecte:
+				animated_sprite_2d.play("quiet_objecte")
+			else:
+				animated_sprite_2d.play("quiet")
 		ESTAT_ANIMACIO.CORRENTS:
-			animated_sprite_2d.play("corrents")
+			if te_objecte:
+				animated_sprite_2d.play("corrents_objecte")
+			else:
+				animated_sprite_2d.play("corrents")
 		ESTAT_ANIMACIO.ESCALANT:
-			animated_sprite_2d.play("escalar")
+			if te_objecte:
+				animated_sprite_2d.play("escalar_objecte")
+			else:
+				animated_sprite_2d.play("escalar")
 		ESTAT_ANIMACIO.CAIENT:
-			animated_sprite_2d.play("caient")
+			if te_objecte:
+				animated_sprite_2d.play("caient_objecte")
+			else:
+				animated_sprite_2d.play("caient")
 
 const cope = preload("uid://c6vhq2412811k") #"res://recursos/cope_sprite_frames.tres"
 const wope = preload("uid://3c58negltxbs") #"res://recursos/wope_sprite_frames.tres"
@@ -222,7 +266,10 @@ func _on_animated_sprite_2d_animation_finished() -> void:
 	actualitza_animacio(estat)
 
 func salta() -> void:
-	animated_sprite_2d.play("saltar")
+	if objecte_en_ma != null:
+		animated_sprite_2d.play("saltar_objecte")
+	else:
+		animated_sprite_2d.play("saltar")
 	animacio_bloquejada = true
 	# Hem de crear un retard artifical per encaixar el salt amb l'animació
 	get_tree().create_timer(0.15, false, true).timeout.connect(func(): salt = true)

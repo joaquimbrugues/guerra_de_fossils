@@ -45,7 +45,7 @@ var objecte_en_ma: Item = null:
 	set(nou_objecte):
 		objecte_en_ma = nou_objecte
 		# Adapta l'animació al nou objecte/falta d'objecte
-		actualitza_animacio(estat)
+		actualitza_animacio()
 		if objecte_en_ma != null:
 			var pare = objecte_en_ma.get_parent()
 			if pare != null:
@@ -65,6 +65,7 @@ var escalant: bool = false:
 		escalant = nou_escalant
 		if escalant:
 			posicio_objecte_ma = posicio_objecte_dalt.position
+			força = 0.0
 		else:
 			match orientacio:
 				ORIENTACIO.DRETA:
@@ -88,7 +89,12 @@ var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
 				if estat != ESTAT_ANIMACIO.ESCALANT:
 					posicio_objecte_ma = posicio_objecte_esquerra.position
 # Força acumulada pel personatge
-var força: float = força_minima
+var força: float = força_minima:
+	set(nova_força):
+		força = nova_força
+		if força > força_minima and (estat == ESTAT_ANIMACIO.QUIET or estat == ESTAT_ANIMACIO.CORRENTS):
+			posicio_objecte_ma = posicio_objecte_dalt.position
+			actualitza_animacio()
 # Temps acumulat sense explosius pel personatge
 var temps_sense_explosius: float = 0.0
 
@@ -157,13 +163,13 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
 		# Agafem l'ítem més proper, si existeix, només si estem al terra
 		agafar_objecte()
-	elif Input.is_action_just_released(controls.llença):
+	elif Input.is_action_just_released(controls.llença) and not escalant:
 		# Si deixem de prémer el botó d'acumular força, llencem l'objecte a la mà i perdem tota la força
 		llençar_objecte()
 		força = força_minima
 	elif Input.is_action_just_pressed(controls.mou_amunt) and is_on_floor():
 		salta()
-	elif Input.is_action_pressed(controls.llença) and objecte_en_ma != null:
+	elif Input.is_action_pressed(controls.llença) and not escalant and objecte_en_ma != null:
 		# Si tenim un objecte a la mà podem acumular força per llençar-lo
 		var inc_força = força_maxima * delta / temps_força_maxima
 		força = min(força_maxima, força + inc_força)
@@ -235,17 +241,23 @@ var estat: ESTAT_ANIMACIO:
 			actualitza_animacio(nou_estat)
 		estat = nou_estat
 
-func actualitza_animacio(e: ESTAT_ANIMACIO) -> void:
+func actualitza_animacio(e: ESTAT_ANIMACIO = estat) -> void:
 	var te_objecte = objecte_en_ma != null
 	match e:
 		ESTAT_ANIMACIO.QUIET:
 			if te_objecte:
-				animated_sprite_2d.play("quiet_objecte")
+				if força > força_minima:
+					animated_sprite_2d.play("quiet_força")
+				else:
+					animated_sprite_2d.play("quiet_objecte")
 			else:
 				animated_sprite_2d.play("quiet")
 		ESTAT_ANIMACIO.CORRENTS:
 			if te_objecte:
-				animated_sprite_2d.play("corrents_objecte")
+				if força > força_minima:
+					animated_sprite_2d.play("corrents_força")
+				else:
+					animated_sprite_2d.play("corrents_objecte")
 			else:
 				animated_sprite_2d.play("corrents")
 		ESTAT_ANIMACIO.ESCALANT:
@@ -275,7 +287,7 @@ func _ready() -> void:
 func _on_animated_sprite_2d_animation_finished() -> void:
 	animacio_bloquejada = false
 	treient_explosiu = false
-	actualitza_animacio(estat)
+	actualitza_animacio()
 
 # Per arreglar algunes transicions estranyes entre animacions
 func _on_animated_sprite_2d_animation_changed() -> void:

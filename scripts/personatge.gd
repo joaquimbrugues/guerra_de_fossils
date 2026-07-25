@@ -5,7 +5,7 @@ enum ORIENTACIO { ESQUERRA, DRETA, }
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var posicio_objecte_esquerra: Marker2D = $PosicioObjecteEsquerra
 @onready var posicio_objecte_dreta: Marker2D = $PosicioObjecteDreta
-@onready var posicio_objecte_escalant: Marker2D = $PosicioObjecteEscalant
+@onready var posicio_objecte_dalt: Marker2D = $PosicioObjecteDalt
 
 
 ## Velocitat de moviment horitzontal
@@ -64,7 +64,7 @@ var escalant: bool = false:
 	set(nou_escalant):
 		escalant = nou_escalant
 		if escalant:
-			posicio_objecte_ma = posicio_objecte_escalant.position
+			posicio_objecte_ma = posicio_objecte_dalt.position
 		else:
 			match orientacio:
 				ORIENTACIO.DRETA:
@@ -184,8 +184,10 @@ func _physics_process(delta: float) -> void:
 			var direccio_y: float = Input.get_axis(controls.mou_amunt, controls.mou_avall)
 			if direccio_y:
 				velocity.y = direccio_y * rapidesa_y
+				animated_sprite_2d.play()
 			else:
 				velocity.y = move_toward(velocity.y, 0, rapidesa_y)
+				animated_sprite_2d.pause()
 		elif direccio_x == normal.x:
 			# Estem empenyent contra la paret: saltem!
 			escalant = true
@@ -264,6 +266,10 @@ func _ready() -> void:
 func _on_animated_sprite_2d_animation_finished() -> void:
 	animacio_bloquejada = false
 	actualitza_animacio(estat)
+
+# Per arreglar algunes transicions estranyes entre animacions
+func _on_animated_sprite_2d_animation_changed() -> void:
+	animacio_bloquejada = false
 
 func salta() -> void:
 	if objecte_en_ma != null:

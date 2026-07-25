@@ -24,6 +24,8 @@ enum ORIENTACIO { ESQUERRA, DRETA, }
 @export var temps_força_maxima: float
 ## Temps (en segons) màxim sense tenir un explosiu a les mans
 @export var temps_maxim_sense_explosiu: float
+## Temps (en segons) que el personatge queda afectat per una bomba
+@export var temps_calcinat: float
 
 ## Aquesta senyal indica que el Personatge ha deixat anar un objecte.
 ## És responsabilitat de qui inclogui aquest node donar un nou pare al node `objecte`
@@ -47,7 +49,7 @@ var objecte_en_ma: Item = null:
 	set(nou_objecte):
 		objecte_en_ma = nou_objecte
 		# Adapta l'animació al nou objecte/falta d'objecte
-		if not llençant:
+		if not (llençant or calcinat):
 			actualitza_animacio()
 		if objecte_en_ma != null:
 			var pare = objecte_en_ma.get_parent()
@@ -173,30 +175,31 @@ func llençar_objecte() -> void:
 var treient_explosiu: bool = false
 
 func _process(delta: float) -> void:
-	if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
-		# Agafem l'ítem més proper, si existeix, només si estem al terra
-		agafar_objecte()
-	elif Input.is_action_just_released(controls.llença) and not escalant:
-		# Si deixem de prémer el botó d'acumular força, llencem l'objecte a la mà i perdem tota la força
-		llençar_objecte()
-		força = força_minima
-	elif Input.is_action_just_pressed(controls.mou_amunt) and is_on_floor():
-		salta()
-	elif Input.is_action_pressed(controls.llença) and not escalant and objecte_en_ma != null:
-		# Si tenim un objecte a la mà podem acumular força per llençar-lo
-		var inc_força = força_maxima * delta / temps_força_maxima
-		força = min(força_maxima, força + inc_força)
-	if temps_sense_explosius >= temps_maxim_sense_explosiu and not treient_explosiu:
-		#Instancia un explosiu i agafa'l
-		var nou_explosiu: Explosiu = instanciar_explosiu()
-		agafar_explosiu(nou_explosiu, true)	# El `temps_sense_explosius` es reseteja quan et cau un explosiu a les mans
-	elif objecte_en_ma == null or objecte_en_ma is not Explosiu:
-		# Si no tenim un explosiu a la mà, augmenta el comptador
-		temps_sense_explosius += delta
+	if not calcinat:
+		if Input.is_action_just_pressed(controls.mou_avall) and is_on_floor():
+			# Agafem l'ítem més proper, si existeix, només si estem al terra
+			agafar_objecte()
+		elif Input.is_action_just_released(controls.llença) and not escalant:
+			# Si deixem de prémer el botó d'acumular força, llencem l'objecte a la mà i perdem tota la força
+			llençar_objecte()
+			força = força_minima
+		elif Input.is_action_just_pressed(controls.mou_amunt) and is_on_floor():
+			salta()
+		elif Input.is_action_pressed(controls.llença) and not escalant and objecte_en_ma != null:
+			# Si tenim un objecte a la mà podem acumular força per llençar-lo
+			var inc_força = força_maxima * delta / temps_força_maxima
+			força = min(força_maxima, força + inc_força)
+		if temps_sense_explosius >= temps_maxim_sense_explosiu and not treient_explosiu:
+			#Instancia un explosiu i agafa'l
+			var nou_explosiu: Explosiu = instanciar_explosiu()
+			agafar_explosiu(nou_explosiu, true)	# El `temps_sense_explosius` es reseteja quan et cau un explosiu a les mans
+		elif objecte_en_ma == null or objecte_en_ma is not Explosiu:
+			# Si no tenim un explosiu a la mà, augmenta el comptador
+			temps_sense_explosius += delta
 
 func _physics_process(delta: float) -> void:
 	# Input horitzontal, o frena
-	var direccio_x: float = Input.get_axis(controls.mou_esquerra, controls.mou_dreta)
+	var direccio_x: float = Input.get_axis(controls.mou_esquerra, controls.mou_dreta) if not calcinat else 0.0
 	if direccio_x:
 		velocity.x = direccio_x * rapidesa_x
 		orientacio = ORIENTACIO.DRETA if direccio_x > 0.0 else ORIENTACIO.ESQUERRA
@@ -336,7 +339,7 @@ func animacio_llença() -> void:
 ### SENYALS
 # Si un ítem entra a l'àrea on podem agafar objectes, introduïm-lo a la col·lecció d'objectes agafables
 func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
-	if body is Explosiu and not body.agafat and body.darrer_propietari != controls.index_jugador:
+	if body is Explosiu and not body.agafat and body.darrer_propietari != controls.index_jugador and not calcinat:
 		agafar_explosiu(body as Explosiu, false)
 	elif body is Item and not body.agafat:
 		# Inserta body al diccionari
@@ -346,3 +349,24 @@ func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
 func _on_area_afagar_objectes_body_exited(body: Node2D) -> void:
 	if body is Item and body in objectes_agafables:
 		objectes_agafables.erase(body)
+
+### ALTRES COSES
+# El personatge es troba afectat per una explosió: no es pot moure, no acumula força ni temps sense bombes, ni pot respondre a controls
+var calcinat: bool = false:
+	set(nou_calcinat):
+		calcinat = nou_calcinat
+		if calcinat:
+			animated_sprite_2d.play("calcinat")
+			animacio_bloquejada = true
+			força = força_minima
+			temps_sense_explosius = 0.0
+			salt = false
+			if objecte_en_ma != null:
+				objecte_en_ma.agafat = false
+				objecte_alliberat.emit(objecte_en_ma)
+				objecte_en_ma = null
+			get_tree().create_timer(temps_calcinat, false, true).timeout.connect(func():
+				calcinat = false
+				animacio_bloquejada = false
+				actualitza_animacio()
+			)

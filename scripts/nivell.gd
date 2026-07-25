@@ -2,7 +2,8 @@ extends Node2D
 
 @onready var items: Node2D = $Items
 @onready var capa_roca: TileMapLayer = $Capes/CapaRoca
-
+@onready var personatge_1: CharacterBody2D = $Personatge1
+@onready var personatge_2: CharacterBody2D = $Personatge2
 
 func assigna_item(item: Item) -> void:
 	item.call_deferred("reparent", items)
@@ -14,11 +15,12 @@ func _on_personatge_2_objecte_alliberat(objecte: Item) -> void:
 	assigna_item(objecte)
 
 func resol_explosio(bomba: Explosiu) -> void:
-	# 3- Eliminar les caselles que correspongui
 	var centre: Vector2 = to_local(bomba.get_global_position())
 	var casella_centre: Vector2i = capa_roca.local_to_map(centre)
 	var tipus_bomba: PropietatsExplosiu.TIPUS_EXPLOSIU = bomba.propietats.tipus_explosiu
 	var caselles_radi: int = bomba.propietats.radi_explosio
+	var casella_jugador_1: Vector2i = capa_roca.local_to_map(to_local(personatge_1.get_global_position()))
+	var casella_jugador_2: Vector2i = capa_roca.local_to_map(to_local(personatge_2.get_global_position()))
 	# Bucle a través de les caselles dins del "diamant" de radi de l'explosió
 	for y in range(- caselles_radi, caselles_radi + 1):
 		for x in range( maxi(y - caselles_radi, - y - caselles_radi), mini(caselles_radi - y, y + caselles_radi) + 1):
@@ -39,6 +41,11 @@ func resol_explosio(bomba: Explosiu) -> void:
 						if terreny_casella != 2:
 							# Roca tova o dura
 							capa_roca.set_cell(casella, -1)	# Esborrem la casella del TileMap
+			# Afectem els jugadors
+			if casella == casella_jugador_1:
+				personatge_1.calcinat = true
+			if casella == casella_jugador_2:
+				personatge_2.calcinat = true
 
 func _on_personatge_1_explosio_bomba(bomba: Explosiu) -> void:
 	resol_explosio(bomba)

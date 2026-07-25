@@ -19,6 +19,7 @@ velocitat_salt = -4500.0
 "força_maxima" = 15000.0
 "temps_força_maxima" = 2.5
 temps_maxim_sense_explosiu = 5.0
+temps_calcinat = 1.5
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
 position = Vector2(-30, 156)

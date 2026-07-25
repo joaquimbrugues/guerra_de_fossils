@@ -323,7 +323,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_7pxgp")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"caient",
 "speed": 5.0
 }, {
@@ -348,7 +348,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_s51jb")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"caient_objecte",
 "speed": 5.0
 }, {

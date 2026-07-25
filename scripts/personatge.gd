@@ -3,7 +3,8 @@ extends CharacterBody2D
 enum ORIENTACIO { ESQUERRA, DRETA, }
 
 @onready var posicio_objecte: Marker2D = $PosicioObjecte
-@onready var animated_sprite_2d_cope: AnimatedSprite2D = $AnimatedSprite2DCope
+@onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
+
 
 ## Velocitat de moviment horitzontal
 @export var rapidesa_x: float
@@ -54,9 +55,9 @@ var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
 		# Canviar l'orientació de l'animatedsprite sempre que canviï l'orientació del personatge
 		match orientacio:
 			ORIENTACIO.DRETA:
-				animated_sprite_2d_cope.flip_h = false
+				animated_sprite_2d.flip_h = false
 			ORIENTACIO.ESQUERRA:
-				animated_sprite_2d_cope.flip_h = true
+				animated_sprite_2d.flip_h = true
 # Força acumulada pel personatge
 var força: float = força_minima
 # Temps acumulat sense explosius pel personatge
@@ -67,6 +68,9 @@ var explosiu_petit = preload("uid://btvstk0pkiw34")
 var explosiu_mitjà = preload("uid://d3405s7yxiabh")
 var explosiu_gran = preload("uid://b3x4ysaenup5i")
 var plantilles_explosius := [explosiu_petit, explosiu_mitjà, explosiu_gran]
+
+# Variable per controlar el salt amb retard exigit per l'animació
+var salt: bool = false
 
 # Mètode per crear una instància d'un explosiu a l'atzar:
 func instanciar_explosiu() -> Explosiu:
@@ -119,6 +123,8 @@ func _process(delta: float) -> void:
 		# Si deixem de prémer el botó d'acumular força, llencem l'objecte a la mà i perdem tota la força
 		llençar_objecte()
 		força = força_minima
+	elif Input.is_action_just_pressed(controls.mou_amunt) and is_on_floor():
+		salta()
 	elif Input.is_action_pressed(controls.llença) and objecte_en_ma != null:
 		# Si tenim un objecte a la mà podem acumular força per llençar-lo
 		var inc_força = força_maxima * delta / temps_força_maxima
@@ -137,6 +143,7 @@ func _physics_process(delta: float) -> void:
 	if direccio_x:
 		velocity.x = direccio_x * rapidesa_x
 		orientacio = ORIENTACIO.DRETA if direccio_x > 0.0 else ORIENTACIO.ESQUERRA
+
 	else:
 		velocity.x = move_toward(velocity.x, 0, rapidesa_x)
 
@@ -157,16 +164,70 @@ func _physics_process(delta: float) -> void:
 			escalant = true
 			velocity.y = velocitat_salt
 
-	if not escalant:
-		# Afegeix la gravetat
-		if not is_on_floor():
+	if escalant:
+		# Adaptem l'animació
+		estat = ESTAT_ANIMACIO.ESCALANT
+	else:
+		if is_on_floor():
+			# Salt
+			if salt:
+				velocity.y = velocitat_salt
+				salt = false
+			else:
+				estat = ESTAT_ANIMACIO.QUIET if direccio_x == 0.0 else ESTAT_ANIMACIO.CORRENTS
+		else:
+			# Caient
+			estat = ESTAT_ANIMACIO.CAIENT
+			# Afegeix la gravetat
 			velocity += get_gravity() * delta
-		# Salt
-		if Input.is_action_just_pressed(controls.mou_amunt) and is_on_floor():
-			velocity.y = velocitat_salt
 
 	move_and_slide()
 
+
+### COSES RELACIONADES AMB LES ANIMACIONS
+var animacio_bloquejada: bool = false
+enum ESTAT_ANIMACIO { QUIET, CORRENTS, ESCALANT, CAIENT, }
+var estat: ESTAT_ANIMACIO:
+	set(nou_estat):
+		if nou_estat != estat and not animacio_bloquejada:
+			actualitza_animacio(nou_estat)
+		estat = nou_estat
+
+func actualitza_animacio(e: ESTAT_ANIMACIO) -> void:
+	match e:
+		ESTAT_ANIMACIO.QUIET:
+			animated_sprite_2d.play("quiet")
+		ESTAT_ANIMACIO.CORRENTS:
+			animated_sprite_2d.play("corrents")
+		ESTAT_ANIMACIO.ESCALANT:
+			animated_sprite_2d.play("escalar")
+		ESTAT_ANIMACIO.CAIENT:
+			animated_sprite_2d.play("caient")
+
+const cope = preload("uid://c6vhq2412811k") #"res://recursos/cope_sprite_frames.tres"
+const wope = preload("uid://3c58negltxbs") #"res://recursos/wope_sprite_frames.tres"
+
+func _ready() -> void:
+	# Fem el setup del personatge: segons qui dels dos sigui, li donem els SpriteFrames corresponents
+	match controls.index_jugador:
+		0:	#Cope
+			animated_sprite_2d.sprite_frames = cope
+		1:	#Wope
+			animated_sprite_2d.sprite_frames = wope
+	pass
+
+# Ens ajuda a enllaçar algunes animacions
+func _on_animated_sprite_2d_animation_finished() -> void:
+	animacio_bloquejada = false
+	actualitza_animacio(estat)
+
+func salta() -> void:
+	animated_sprite_2d.play("saltar")
+	animacio_bloquejada = true
+	# Hem de crear un retard artifical per encaixar el salt amb l'animació
+	get_tree().create_timer(0.15, false, true).timeout.connect(func(): salt = true)
+
+### SENYALS
 # Si un ítem entra a l'àrea on podem agafar objectes, introduïm-lo a la col·lecció d'objectes agafables
 func _on_area_afagar_objectes_body_entered(body: Node2D) -> void:
 	if body is Explosiu and not body.agafat and body.darrer_propietari != controls.index_jugador:

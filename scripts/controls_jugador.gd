@@ -2,7 +2,7 @@ class_name ControlsJugador
 extends Resource
 
 ## Índex identificador del jugador
-@export var index_jugador: int = 0
+@export_range(0,1) var index_jugador: int = 0
 ## Nom (al mapa d'entrades) de la tecla per moure's a l'esquerra
 @export var mou_esquerra: StringName = "p1_esquerra"
 ## Nom (al mapa d'entrades) de la tecla per moure's a la dreta

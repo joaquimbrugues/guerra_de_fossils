@@ -4,6 +4,9 @@ extends Item
 ## Propietats de l'explosiu
 @export var propietats: PropietatsExplosiu
 
+func _init() -> void:
+	z_index = 1
+
 var plantilla_etiqueta_compte_enrere = preload("uid://brbsl25c07q5f")
 
 # Indica quin és el darrer personatge que ha agafat aquest explosiu (0 a l'esquerra, 1 a la dreta)
@@ -21,10 +24,22 @@ func temporitzador_acabat() -> void:
 	if compte_enrere == 0:
 		# EXPLOSIÓ!
 		var animated_sprite = get_child(0) as AnimatedSprite2D	# Poc robust, però suficient si som consistents
+		var collision_shape = get_child(1) as CollisionShape2D	# Poc robust, però si tot va bé ok
 		animated_sprite.play("explotant")
 		animated_sprite.animation_finished.connect(func ():
-			explosio_bomba.emit(self)
-			queue_free()
+			match animated_sprite.animation:
+				"explotant":
+					explosio_bomba.emit(self)
+					collision_shape.disabled = true
+					set_deferred("freeze", true)
+					match propietats.tipus_explosiu:
+						PropietatsExplosiu.TIPUS_EXPLOSIU.Gran:
+							animated_sprite.scale = Vector2.ONE
+						PropietatsExplosiu.TIPUS_EXPLOSIU.Mitja:
+							animated_sprite.scale = 0.75 * Vector2.ONE
+					animated_sprite.play("explosio")
+				"explosio":
+					queue_free()
 		)
 	else:
 		# COMPTE ENRERE

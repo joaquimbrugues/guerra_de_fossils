@@ -2,7 +2,36 @@
 
 [ext_resource type="Script" uid="uid://cno1ijy0q8qv" path="res://scripts/explosiu.gd" id="1_ujvlw"]
 [ext_resource type="Resource" uid="uid://dj84ei00f2eus" path="res://recursos/propietats_explosiu_gran.tres" id="2_u7rrt"]
+[ext_resource type="Texture2D" uid="uid://6civh35yjwo7" path="res://assets/sprites/explosió.png" id="3_loitg"]
 [ext_resource type="Texture2D" uid="uid://hd8gg2kadaoa" path="res://assets/sprites/exp_gran.png" id="3_u7rrt"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6onl4"]
+atlas = ExtResource("3_loitg")
+region = Rect2(0, 0, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c58f5"]
+atlas = ExtResource("3_loitg")
+region = Rect2(3936, 0, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mjaii"]
+atlas = ExtResource("3_loitg")
+region = Rect2(0, 3207, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_naqpk"]
+atlas = ExtResource("3_loitg")
+region = Rect2(3936, 3207, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7eng7"]
+atlas = ExtResource("3_loitg")
+region = Rect2(7872, 0, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sdxkd"]
+atlas = ExtResource("3_loitg")
+region = Rect2(7872, 3207, 3936, 3207)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sh36r"]
+atlas = ExtResource("3_loitg")
+region = Rect2(0, 6414, 3936, 3207)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_loitg"]
 atlas = ExtResource("3_u7rrt")
@@ -30,6 +59,32 @@ region = Rect2(0, 1573, 1407, 1573)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1pj1a"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6onl4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c58f5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mjaii")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_naqpk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7eng7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sdxkd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sh36r")
+}],
+"loop": 0,
+"name": &"explosio",
+"speed": 10.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_loitg")
@@ -74,7 +129,7 @@ metadata/_custom_type_script = "uid://cno1ijy0q8qv"
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=340354194]
 scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_1pj1a")
-animation = &"explotant"
+animation = &"explosio"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668875071]

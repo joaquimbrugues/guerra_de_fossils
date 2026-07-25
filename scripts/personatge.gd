@@ -3,6 +3,7 @@ extends CharacterBody2D
 enum ORIENTACIO { ESQUERRA, DRETA, }
 
 @onready var posicio_objecte: Marker2D = $PosicioObjecte
+@onready var animated_sprite_2d_cope: AnimatedSprite2D = $AnimatedSprite2DCope
 
 ## Velocitat de moviment horitzontal
 @export var rapidesa_x: float
@@ -47,7 +48,15 @@ var objecte_en_ma: Item = null:
 				# Resetegem el comptador sense explosiu en mà
 				temps_sense_explosius = 0.0
 # Orientació actual del personatge
-var orientacio: ORIENTACIO = ORIENTACIO.DRETA
+var orientacio: ORIENTACIO = ORIENTACIO.DRETA:
+	set(nova_orientacio):
+		orientacio = nova_orientacio
+		# Canviar l'orientació de l'animatedsprite sempre que canviï l'orientació del personatge
+		match orientacio:
+			ORIENTACIO.DRETA:
+				animated_sprite_2d_cope.flip_h = false
+			ORIENTACIO.ESQUERRA:
+				animated_sprite_2d_cope.flip_h = true
 # Força acumulada pel personatge
 var força: float = força_minima
 # Temps acumulat sense explosius pel personatge

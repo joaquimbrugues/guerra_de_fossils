@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dc8w6yrr6wqus"]
+
+[ext_resource type="Script" uid="uid://cgnoci21on1gd" path="res://scripts/fossil_item.gd" id="1_uukr3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
+size = Vector2(350, 350)
+
+[node name="FossilItem" type="RigidBody2D" unique_id=2011328313]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_uukr3")
+metadata/_custom_type_script = "uid://dnvugb6kleewx"
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1578956105]
+custom_minimum_size = Vector2(350, 350)
+offset_left = -175.0
+offset_top = -175.0
+offset_right = 175.0
+offset_bottom = 175.0
+color = Color(0, 1, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=730198301]
+shape = SubResource("RectangleShape2D_1pj1a")

@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://7wq1vsbs5mvw"]
 
 [ext_resource type="Script" uid="uid://d3r8y7evhk0ka" path="res://scripts/personatge.gd" id="1_ixefd"]
+[ext_resource type="SpriteFrames" uid="uid://c6vhq2412811k" path="res://recursos/cope_sprite_frames.tres" id="2_skwxk"]
+[ext_resource type="SpriteFrames" uid="uid://3c58negltxbs" path="res://recursos/wope_sprite_frames.tres" id="3_coc4i"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pj1a"]
-size = Vector2(400, 400)
+size = Vector2(606, 767)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1pj1a"]
-radius = 13.91662315362459
+radius = 13.360014970051497
 
 [node name="Personatge" type="CharacterBody2D" unique_id=879555523]
 collision_mask = 2
@@ -20,25 +22,35 @@ velocitat_salt = -4500.0
 temps_maxim_sense_explosiu = 5.0
 
 [node name="Collisio" type="CollisionShape2D" parent="." unique_id=952930749]
+position = Vector2(-30, 156)
 shape = SubResource("RectangleShape2D_1pj1a")
-
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1655365102]
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = 200.0
-color = Color(1, 0, 0.12156863, 1)
+debug_color = Color(0.98627216, 0, 0.33007783, 0.41960785)
 
 [node name="AreaAfagarObjectes" type="Area2D" parent="." unique_id=477650493]
 collision_layer = 0
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaAfagarObjectes" unique_id=385445855]
+position = Vector2(9, 138)
 scale = Vector2(50, 50)
 shape = SubResource("CircleShape2D_1pj1a")
 
 [node name="PosicioObjecte" type="Marker2D" parent="." unique_id=83870367]
 position = Vector2(5, -359)
+
+[node name="AnimatedSprite2DCope" type="AnimatedSprite2D" parent="." unique_id=889372690]
+scale = Vector2(0.75, 0.75)
+sprite_frames = ExtResource("2_skwxk")
+animation = &"quiet"
+autoplay = "quiet"
+
+[node name="AnimatedSprite2DWope" type="AnimatedSprite2D" parent="." unique_id=1404683645]
+visible = false
+position = Vector2(-942, 15)
+scale = Vector2(0.75, 0.75)
+sprite_frames = ExtResource("3_coc4i")
+animation = &"treure_objecte"
+autoplay = "quiet"
 
 [connection signal="body_entered" from="AreaAfagarObjectes" to="." method="_on_area_afagar_objectes_body_entered"]
 [connection signal="body_exited" from="AreaAfagarObjectes" to="." method="_on_area_afagar_objectes_body_exited"]
